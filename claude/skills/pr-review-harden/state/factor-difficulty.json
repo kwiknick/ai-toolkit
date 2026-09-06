@@ -1,0 +1,16 @@
+{
+  "ceiling": 3,
+  "escalate_after": 3,
+  "factors": {
+    "1-architectural-alignment": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "2-logic-correctness": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "3-security-data-protection": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "4-performance-scale": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "5-error-handling-observability": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "6-test-adequacy": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "7-readability-maintainability": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "8-state-concurrency": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "9-documentation-contracts": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null},
+    "10-standards-conventions": {"level": 1, "consecutive_catches": 0, "consecutive_misses": 0, "status": "escalating", "last_run": null}
+  }
+}
