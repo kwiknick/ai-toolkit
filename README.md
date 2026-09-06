@@ -70,6 +70,10 @@ start) and both are available:
 Adding a new skill to this repo later means adding one new individual
 symlink for it — never symlink `~/.claude/skills` itself.
 
+## License
+
+MIT — see [LICENSE](LICENSE).
+
 ## Rules for what goes in this repo
 
 - No personal information, credentials, tokens, internal hostnames, or
