@@ -16,6 +16,8 @@ it to a weekly cadence using the `schedule` skill:
    gate manual indefinitely - see the design spec's rationale for why
    this skill never self-edits `pr-review` content autonomously.
 
-Not set up yet because the loop hasn't been validated end-to-end. Do
-this after Task 5 in the implementation plan has been run at least
-once and its output looks sane.
+Status: the first live run happened on 2026-09-06 (10/10 catches at
+level 1 — see `runs/2026-09-06.md`). The loop's basic shape is
+validated; promote to cron once a few more runs (ideally including at
+least one real miss, to exercise the regression-corpus and
+pending-patch paths) look sane.

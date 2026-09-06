@@ -9,6 +9,7 @@ copilot/    — GitHub Copilot custom instructions / prompt files
 grok/       — Grok helper configs
 gemini/     — Gemini skill/extension configs
 docs/specs/ — Design docs for anything non-trivial built here
+docs/plans/ — Implementation plans for anything non-trivial built here
 ```
 
 ## Rules for what goes in this repo
@@ -22,6 +23,15 @@ docs/specs/ — Design docs for anything non-trivial built here
 
 ## Claude skills
 
-`claude/skills/` is symlinked from `~/skills` so editing a skill here
-*is* editing the live skill Claude Code loads — this repo is the
-single source of truth, git tracks every revision.
+Claude Code loads personal skills from `~/.claude/skills/`, which also
+holds other unrelated personal skills belonging to the repo owner (some
+with credentials). To avoid exposing those to this repo, skills built
+here are symlinked **individually**, never as a whole-directory symlink:
+
+```
+~/.claude/skills/pr-review        -> ~/Projects/ai-toolkit/claude/skills/pr-review
+~/.claude/skills/pr-review-harden -> ~/Projects/ai-toolkit/claude/skills/pr-review-harden
+```
+
+Adding a new skill here means adding one new individual symlink for
+it — never symlink `~/.claude/skills` itself.

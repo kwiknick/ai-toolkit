@@ -69,14 +69,20 @@ than skipping the section.
    e. Update state:
       - **Catch:** `consecutive_catches += 1`, `consecutive_misses = 0`.
         If `consecutive_catches >= escalate_after` (3):
-        - if `level < ceiling` (3): `level += 1`, reset both counters.
+        - if `level < ceiling` (3): `level += 1`, reset both counters, set
+          `status = "escalating"`.
         - else: set `status = "plateaued"`.
-      - **Miss:** write the case permanently to
+        Otherwise (fewer than `escalate_after` consecutive catches so far),
+        set `status = "escalating"` (clearing any prior `needs_attention`).
+      - **Miss:** `consecutive_misses += 1`, `consecutive_catches = 0`. Write the case
+        permanently to
         `regression-cases/<slug>/<new-case-id>.md` (status: active,
         source: synthetic or real-seed, level: the level it was tested
-        at) using the format documented in that directory's README.
-        Set `status = "needs_attention"`. Do **not** change `level`.
-        Draft one targeted bullet to add under that factor's
+        at) using the format documented in that directory's README —
+        name `<new-case-id>` as `<slug>-<YYYY-MM-DD>[-n]` (append `-2`, `-3`, ...
+        if more than one miss on the same factor lands the same day, to avoid
+        filename collisions). Set `status = "needs_attention"`. Do **not** change
+        `level`. Draft one targeted bullet to add under that factor's
         `## Check for` list in `pr-review/factors/<slug>.md`, phrased
         in the same style as the existing bullets, and stage it as a
         "pending patch" for the run report — do not apply it, and do
