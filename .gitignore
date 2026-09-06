@@ -2,3 +2,4 @@
 *.local.md
 local-notes/
 **/state/*.local.json
+.superpowers/
