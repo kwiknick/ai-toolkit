@@ -1,0 +1,4 @@
+.DS_Store
+*.local.md
+local-notes/
+**/state/*.local.json
