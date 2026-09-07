@@ -3,6 +3,10 @@
 Personal library of AI coding-assistant skills, agents, and helper
 configs, organized by tool so each one's native format stays intact.
 
+Requires [Claude Code](https://claude.com/claude-code) for the
+`claude/` skills below — they're plain Markdown instructions Claude
+Code loads and executes, no other runtime needed.
+
 ```
 claude/     — Claude Code skills (SKILL.md-based)
 copilot/    — GitHub Copilot custom instructions / prompt files (placeholder, empty)
@@ -50,7 +54,7 @@ are symlinked in **individually**, never as a whole-directory symlink
 repo's git history).
 
 ```bash
-git clone <this-repo-url> ~/Projects/ai-toolkit   # or wherever you keep projects
+git clone https://github.com/kwiknick/ai-toolkit.git ~/Projects/ai-toolkit   # or wherever you keep projects
 ln -s ~/Projects/ai-toolkit/claude/skills/pr-review        ~/.claude/skills/pr-review
 ln -s ~/Projects/ai-toolkit/claude/skills/pr-review-harden ~/.claude/skills/pr-review-harden
 ```
@@ -62,6 +66,12 @@ start) and both are available:
 /pr-review           # review a PR/diff against the 10-factor rubric
 /pr-review-harden     # run the self-hardening red-team loop
 ```
+
+`/pr-review` needs something to review — paste a diff, point it at a
+PR (e.g. "review PR #42"), or run it from inside a repo with staged
+changes; it'll ask if it can't tell what you mean. `/pr-review-harden`
+needs no input — it tests `pr-review` itself and writes its results
+into `claude/skills/pr-review-harden/runs/` and `state/` in this repo.
 
 Adding a new skill to this repo later means adding one new individual
 symlink for it — never symlink `~/.claude/skills` itself.
