@@ -19,6 +19,13 @@ repo — read and write through it normally), except references to
 `pr-review/...` which are its sibling skill directory,
 `~/.claude/skills/pr-review/`.
 
+When generating a new adversarial case (Phase 2), act as a red team:
+your goal is to get a real defect past `pr-review`, not just to write
+buggy code. Think about what the target factor's checklist would
+catch and construct something that plausibly slips past it — realistic
+diff, routine-sounding description — bounded by the difficulty ceiling
+below, never past it.
+
 ## Phase 1: Regression sweep
 
 1. For every `regression-cases/<slug>/<case-id>.md` file that exists:
@@ -52,9 +59,17 @@ than skipping the section.
       `real-seeds/<slug>/` with `used: false` in its frontmatter.
       With that seed present, use it about 1 time in 4 (roll a random
       choice); otherwise, and always when no unused seed exists,
-      generate a **synthetic** adversarial case yourself, targeting
-      that factor specifically, at the difficulty level named in the
-      table below for the factor's current `level`.
+      **act as a red team** trying to get a real defect past this one
+      factor's review: read `factors/<slug>.md`'s "Check for" list,
+      then construct a PR (diff + description) that plausibly slips
+      past it — a description that reads as routine ("refactor",
+      "small fix", "added X"), and a diff shaped the way an engineer
+      actually under time pressure would write it, not a puzzle
+      built to be hard. Generate this **synthetic** adversarial case
+      yourself, at the difficulty level named in the table below for
+      the factor's current `level` — the red-team framing shapes *how
+      convincingly* the case is built, it is not license to exceed
+      the ceiling.
    b. **Difficulty guidance** (never exceed level 3 — the ceiling is
       deliberate, see the design spec's anti-overfitting rationale):
       - Level 1: an obvious mistake a junior reviewer would catch.
