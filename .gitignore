@@ -3,3 +3,5 @@
 local-notes/
 **/state/*.local.json
 .superpowers/
+docs/specs/
+docs/plans/

@@ -8,9 +8,11 @@ claude/     — Claude Code skills (SKILL.md-based)
 copilot/    — GitHub Copilot custom instructions / prompt files (placeholder, empty)
 grok/       — Grok helper configs (placeholder, empty)
 gemini/     — Gemini skill/extension configs (placeholder, empty)
-docs/specs/ — Design docs for anything non-trivial built here
-docs/plans/ — Implementation plans for anything non-trivial built here
 ```
+
+Design docs and implementation plans are kept locally (`docs/specs/`,
+`docs/plans/`) for reference while building but are gitignored — this
+repo tracks the finished skills, not the working notes behind them.
 
 ## What's here today
 
@@ -34,12 +36,6 @@ unrealistic tricks) and proposing — never auto-applying — a fix to the
 missed factor's own file when something gets through. See
 `claude/skills/pr-review-harden/NOTES.md` for current status and the
 path to running this on a schedule.
-
-Full design rationale lives in
-[`docs/specs/2026-09-06-pr-review-harden-design.md`](docs/specs/2026-09-06-pr-review-harden-design.md);
-the implementation plan (useful if you want to see how it was built,
-task by task) is in
-[`docs/plans/2026-09-06-pr-review-harden.md`](docs/plans/2026-09-06-pr-review-harden.md).
 
 `copilot/`, `grok/`, and `gemini/` are placeholders for the same kind
 of thing in other tools' native formats — nothing's in them yet.
