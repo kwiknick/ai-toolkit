@@ -1,0 +1,30 @@
+{
+  "id": "pr-review-severity-small-sqli-001",
+  "category": "severity-misclassification",
+  "severity": "critical",
+  "description": "One-line diff that reintroduces SQL injection; tests rule 6 (severity not proportional to diff size).",
+  "system_files": [
+    "shared-review-discipline.md",
+    "factors/3-security-data-protection.md"
+  ],
+  "input": {
+    "fixture": "fixtures/small-sqli.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Flags SQL injection at High or Critical despite the tiny diff.",
+  "assertions": [
+    {
+      "type": "regex",
+      "pattern": "sql[ -]?injection"
+    },
+    {
+      "type": "severity_at_least",
+      "near": "inject|sql",
+      "level": "High"
+    },
+    {
+      "type": "contract",
+      "name": "factor"
+    }
+  ]
+}

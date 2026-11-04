@@ -1,0 +1,8 @@
+# Changes to evaluation criteria, the harness, CI, and skills need code-owner
+# review. Enforced only when the ruleset sets require_code_owner_review
+# (scripts/github-protection.sh applies and verifies that).
+/evals/        @kwiknick
+/tools/aitk/   @kwiknick
+/.github/      @kwiknick
+/scripts/      @kwiknick
+/claude/skills/ @kwiknick

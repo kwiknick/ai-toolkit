@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Entry point for the Python harness (stdlib only, Python 3.9+).
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHONPATH="$ROOT/tools${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m aitk "$@"

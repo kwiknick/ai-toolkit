@@ -1,0 +1,37 @@
+{
+  "id": "harden-skill-missing-target-001",
+  "category": "missing-context",
+  "severity": "medium",
+  "description": "Asked to harden a skill that does not exist in this repository.",
+  "input": {
+    "workspace": "fixtures/empty-repo",
+    "prompt": "{workspace}\n\n/harden-skill pr-review"
+  },
+  "expected_behavior": "Reports that the skill or its spec cannot be found and stops without writing files.",
+  "assertions": [
+    {
+      "type": "regex",
+      "pattern": "(not|couldn't|could not|can't|cannot|unable to|doesn't|does not|isn't|is not)[^\\n]{0,40}(find|found|exist|locate|the ai-toolkit|an ai-toolkit)|missing|no `?claude/skills"
+    },
+    {
+      "type": "no_tool_calls",
+      "tools": [
+        "Write",
+        "Edit",
+        "NotebookEdit"
+      ]
+    }
+  ],
+  "system_files": [
+    "SKILL.md"
+  ],
+  "tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "Bash"
+  ],
+  "permission_mode": "acceptEdits"
+}

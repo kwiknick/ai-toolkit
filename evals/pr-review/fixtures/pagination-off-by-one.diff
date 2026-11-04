@@ -1,0 +1,13 @@
+PR title: Fix pagination for large result sets
+PR description: Small fix so the last page is no longer empty.
+
+diff --git a/api/pagination.py b/api/pagination.py
+--- a/api/pagination.py
++++ b/api/pagination.py
+@@ -8,7 +8,7 @@ PAGE_SIZE_MAX = 200
+ def paginate(items, page, page_size):
+     """Return the items for a 1-indexed page."""
+-    start = (page - 1) * page_size
++    start = page * page_size
+     end = start + page_size
+     return items[start:end]

@@ -1,0 +1,10 @@
+PR title: Tiny tweak to user lookup
+PR description: One-line change to support lookup by email.
+
+diff --git a/accounts/repo.py b/accounts/repo.py
+--- a/accounts/repo.py
++++ b/accounts/repo.py
+@@ -21,3 +21,3 @@ class UserRepo:
+     def find_by_email(self, email):
+-        return self.db.query("SELECT id, name FROM users WHERE email = %s", (email,))
++        return self.db.query(f"SELECT id, name FROM users WHERE email = '{email}'")

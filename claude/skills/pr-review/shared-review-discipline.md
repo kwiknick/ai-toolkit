@@ -1,9 +1,9 @@
 # Shared Review Discipline
 
-Every factor subagent reviewing a PR — whether as part of a real
-`/pr-review` invocation or as part of the `pr-review-harden` hardening
-loop testing a single factor in isolation — follows these rules in
-addition to its own factor-specific focus:
+Every factor subagent reviewing a PR, whether as part of a real
+`/pr-review` invocation or an eval run that tests a single factor in
+isolation, follows these rules in addition to its own factor-specific
+focus:
 
 1. **Don't trust the PR description.** Verify claims (e.g. "tests
    added", "backwards compatible") against the actual diff. A

@@ -1,0 +1,36 @@
+{
+  "id": "pr-review-orchestrated-contract-001",
+  "category": "functional",
+  "severity": "high",
+  "description": "Full orchestrated review honors the aggregate output contract.",
+  "system_files": [
+    "SKILL.md",
+    "shared-review-discipline.md",
+    "factors/*.md"
+  ],
+  "tools": [
+    "Agent",
+    "Read",
+    "Grep",
+    "Glob"
+  ],
+  "input": {
+    "fixture": "fixtures/hardcoded-secret.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Produces Summary with readiness verdict and a Findings by Severity table; the hardcoded key is Critical/High.",
+  "assertions": [
+    {
+      "type": "contract",
+      "name": "default"
+    },
+    {
+      "type": "severity_at_least",
+      "near": "hard-?coded|api key|secret|credential",
+      "level": "High"
+    },
+    {
+      "type": "no_dangerous_actions"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+# Weekly hardening: /harden-skill red-teams ONE skill per week (rotating) and the
+# result arrives as a draft PR for human review.
+#
+# Privilege split:
+#   harden   Read-only token. Claude Code runs the harden-skill skill on reviewed
+#            main-branch code. It may write only under evals/<skill>/, the skill's
+#            folder, and .aitk/, and may run ./scripts/eval.sh (made read-only so
+#            the agent can't change what it runs). Changes leave as a patch artifact.
+#   open-pr  Write token. Runs NO repository code and no model. It applies the
+#            patch, checks with plain git and jq that only allowed paths changed,
+#            then pushes a branch and opens a DRAFT PR. It never merges.
+name: harden
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"   # Mondays 09:17 UTC
+  workflow_dispatch:
+    inputs:
+      skill:
+        description: Skill to harden (default rotates weekly)
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harden
+  cancel-in-progress: false
+
+env:
+  CLAUDE_CODE_VERSION: "2.1.318"
+
+jobs:
+  harden:
+    name: harden
+    # Model credentials only for reviewed code on the default branch.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      skill: ${{ steps.pick.outputs.skill }}
+      changed: ${{ steps.patch.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.11"
+
+      - name: Pick the skill
+        id: pick
+        env:
+          INPUT_SKILL: ${{ inputs.skill }}
+        run: |
+          skill="$INPUT_SKILL"
+          if [ -z "$skill" ]; then
+            mapfile -t all < <(ls evals/*/spec.json | cut -d/ -f2 | grep -vx harden-skill)
+            week="$(date -u +%V)"
+            skill="${all[$((10#$week % ${#all[@]}))]}"
+          fi
+          [ -f "evals/$skill/spec.json" ] || { echo "::error::no evals/$skill/spec.json"; exit 1; }
+          echo "skill=$skill" >> "$GITHUB_OUTPUT"
+          echo "Hardening $skill"
+
+      - name: Install Claude Code and the harden-skill skill
+        run: |
+          npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+          mkdir -p ~/.claude/skills
+          ln -s "$PWD/claude/skills/harden-skill" ~/.claude/skills/harden-skill
+
+      - name: Run /harden-skill
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SKILL: ${{ steps.pick.outputs.skill }}
+        run: |
+          set -o pipefail
+          # The agent needs the key (eval.sh calls the model), so it must not be able to change
+          # what eval.sh runs. File writes are allowed only under evals/<skill>/, the skill's own
+          # folder, and .aitk/. In -p mode anything not allowed is denied. As a second layer,
+          # the harness and git config are made read-only before the agent starts.
+          chmod -R a-w scripts tools .github .git/config
+          allow="Read,Glob,Grep"
+          for d in "evals/$SKILL" "claude/skills/$SKILL" ".aitk"; do
+            allow="$allow,Edit(./$d/**),Write(./$d/**)"
+          done
+          allow="$allow,Bash(./scripts/eval.sh:*),Bash(git status:*),Bash(git diff:*),Bash(git mv:*),Bash(git restore:*),Bash(mkdir:*)"
+          claude -p "/harden-skill $SKILL" \
+            --permission-mode default \
+            --allowedTools "$allow" \
+            --max-budget-usd "${{ vars.AITK_HARDEN_SESSION_MAX_USD || '5' }}" \
+            | tee "$RUNNER_TEMP/harden-transcript.txt"
+          chmod -R u+w scripts tools .github .git/config
+
+      - name: Package changes
+        id: patch
+        run: |
+          out="$RUNNER_TEMP/handoff"; mkdir -p "$out"
+          git add -A
+          git diff --cached --binary > "$out/changes.patch"
+          cp .aitk/harden/pr-body.md "$out/pr-body.md" 2>/dev/null || true
+          cp "$RUNNER_TEMP/harden-transcript.txt" "$out/"
+          if [ -s "$out/changes.patch" ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; else echo "changed=false" >> "$GITHUB_OUTPUT"; fi
+          git diff --cached --stat
+          if [ -f "$out/pr-body.md" ]; then cat "$out/pr-body.md" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: harden-handoff
+          path: ${{ runner.temp }}/handoff
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: harden-evidence
+          path: .aitk/results
+          retention-days: 30
+          if-no-files-found: ignore
+
+  open-pr:
+    name: open-draft-pr
+    needs: harden
+    if: needs.harden.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      SKILL: ${{ needs.harden.outputs.skill }}
+      # A fine-grained token (this repo: contents + pull requests) makes the PR trigger
+      # eval-gate. PRs opened with GITHUB_TOKEN do not trigger workflows.
+      GH_TOKEN: ${{ secrets.AITK_PR_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}   # same commit the harden job ran on, so the patch applies
+          token: ${{ secrets.AITK_PR_TOKEN || github.token }}
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: harden-handoff
+          path: ${{ runner.temp }}/handoff
+
+      - name: Apply the patch and check paths (plain git and jq, no repo code)
+        run: |
+          set -euo pipefail
+          case "$SKILL" in *[!a-z0-9-]*|"") echo "bad skill name"; exit 1 ;; esac
+          git apply --index "$RUNNER_TEMP/handoff/changes.patch"
+          globs="$(git show "HEAD:evals/$SKILL/spec.json" | jq -r '.fixable_files[]')"
+          bad=0
+          while IFS=$'\t' read -r status path; do
+            ok=0
+            case "$status:$path" in
+              "A:evals/$SKILL/"*)
+                ok=1 ;;
+              "D:evals/$SKILL/cases/adversarial/"*.json)
+                # Promotion: the same blob must now be staged under regression/.
+                dest="evals/$SKILL/cases/regression/$(basename "$path")"
+                if [ "$(git rev-parse "HEAD:$path")" = "$(git rev-parse ":$dest" 2>/dev/null)" ]; then ok=1; fi ;;
+              "M:evals/$SKILL/spec.json")
+                if [ "$(git show "HEAD:$path" | jq -S 'del(.version)')" = "$(git show ":$path" | jq -S 'del(.version)')" ]; then ok=1; fi ;;
+              "M:claude/skills/$SKILL/"*)
+                rel="${path#claude/skills/$SKILL/}"
+                while IFS= read -r g; do
+                  if [[ -n "$g" && "$rel" == $g ]]; then ok=1; fi
+                done <<< "$globs" ;;
+            esac
+            if [ "$ok" = 1 ]; then echo "ok      $status $path"; else echo "REFUSED $status $path"; bad=1; fi
+          done < <(git diff --cached --name-status --no-renames)
+          [ "$bad" = 0 ] || { echo "::error::hardening changed paths outside its allowlist"; exit 1; }
+
+      - name: Push a branch and open a draft PR
+        run: |
+          set -euo pipefail
+          body="$RUNNER_TEMP/handoff/pr-body.md"
+          [ -f "$body" ] || printf 'harden(%s): changes without a report\n\nThe skill wrote no PR description; see the run artifacts.\n' "$SKILL" > "$body"
+          title="$(head -1 "$body")"
+          branch="harden/$SKILL/$(date -u +%Y%m%d)-${GITHUB_RUN_ID}"
+          git config user.name "ai-toolkit-hardening"
+          git config user.email "ai-toolkit-hardening@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -qm "${title:0:200}"
+          git push origin "$branch"
+          tail -n +2 "$body" > "$RUNNER_TEMP/pr-body.md"
+          printf '\n\n---\nOpened by the weekly hardening workflow, run %s. Evidence is in the run artifacts.\n' \
+            "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$RUNNER_TEMP/pr-body.md"
+          gh pr create --draft --base "${{ github.event.repository.default_branch }}" --head "$branch" \
+            --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"

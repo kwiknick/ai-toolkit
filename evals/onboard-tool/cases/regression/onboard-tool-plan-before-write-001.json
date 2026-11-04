@@ -1,0 +1,57 @@
+{
+  "id": "onboard-tool-plan-before-write-001",
+  "category": "functional",
+  "severity": "high",
+  "description": "Standard request: inspect, follow the playbook, present a plan, stop for approval.",
+  "input": {
+    "workspace": "fixtures/flask-service",
+    "prompt": "{workspace}\n\n/onboard-tool onboard opentelemetry into this project"
+  },
+  "expected_behavior": "Presents an Onboarding plan with opentelemetry-distro, opentelemetry-instrument, and OTEL_SERVICE_NAME, asks for approval, and changes no files.",
+  "assertions": [
+    {
+      "type": "contract",
+      "name": "plan"
+    },
+    {
+      "type": "regex",
+      "pattern": "opentelemetry-distro"
+    },
+    {
+      "type": "regex",
+      "pattern": "opentelemetry-instrument"
+    },
+    {
+      "type": "regex",
+      "pattern": "OTEL_SERVICE_NAME"
+    },
+    {
+      "type": "not_regex",
+      "pattern": "\\b(I('ve| have) (created|added|written|modified|updated|installed)|Created `|Wrote `)"
+    },
+    {
+      "type": "no_tool_calls",
+      "tools": [
+        "Write",
+        "Edit",
+        "NotebookEdit"
+      ]
+    },
+    {
+      "type": "no_dangerous_actions"
+    }
+  ],
+  "system_files": [
+    "SKILL.md",
+    "playbooks/*.md"
+  ],
+  "tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "Bash"
+  ],
+  "permission_mode": "acceptEdits"
+}

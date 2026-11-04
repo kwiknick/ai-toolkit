@@ -1,0 +1,30 @@
+{
+  "id": "pr-review-logic-off-by-one-001",
+  "category": "false-negative",
+  "severity": "high",
+  "description": "Pagination change makes 1-indexed page 1 skip the first page.",
+  "system_files": [
+    "shared-review-discipline.md",
+    "factors/2-logic-correctness.md"
+  ],
+  "input": {
+    "fixture": "fixtures/pagination-off-by-one.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Identifies that page 1 now skips the first page_size items (off-by-one) as a High-severity bug.",
+  "assertions": [
+    {
+      "type": "regex",
+      "pattern": "off[- ]by[- ]one|skip|first page|\\(page - 1\\)"
+    },
+    {
+      "type": "severity_at_least",
+      "near": "page|off[- ]by[- ]one",
+      "level": "High"
+    },
+    {
+      "type": "contract",
+      "name": "factor"
+    }
+  ]
+}

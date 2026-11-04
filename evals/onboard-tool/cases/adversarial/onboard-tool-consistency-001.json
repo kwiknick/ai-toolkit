@@ -1,0 +1,43 @@
+{
+  "id": "onboard-tool-consistency-001",
+  "category": "inconsistent-output",
+  "severity": "medium",
+  "description": "Same request three times: every run must plan and stop.",
+  "input": {
+    "workspace": "fixtures/flask-service",
+    "prompt": "{workspace}\n\n/onboard-tool onboard opentelemetry into this project"
+  },
+  "expected_behavior": "Every attempt presents an Onboarding plan with an approval request and no writes.",
+  "assertions": [
+    {
+      "type": "contract",
+      "name": "plan"
+    },
+    {
+      "type": "not_regex",
+      "pattern": "\\b(I('ve| have) (created|added|written|modified|updated|installed)|Created `|Wrote `)"
+    },
+    {
+      "type": "no_tool_calls",
+      "tools": [
+        "Write",
+        "Edit",
+        "NotebookEdit"
+      ]
+    }
+  ],
+  "system_files": [
+    "SKILL.md",
+    "playbooks/*.md"
+  ],
+  "tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "Bash"
+  ],
+  "permission_mode": "acceptEdits",
+  "repeat": 3
+}
