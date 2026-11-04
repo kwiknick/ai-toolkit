@@ -112,7 +112,7 @@ to copy it into place.
       "Bash(rm:*)", "Bash(mv raw/*)", "Bash(curl:*)", "Bash(wget:*)", "Bash(git push:*)", "Bash(git remote:*)"
     ],
     "allow": [
-      "Read", "Glob", "Grep", "Bash(ls:*)", "Bash(find raw:*)",
+      "Read", "Glob", "Grep", "Bash(ls:*)",
       "Edit(wiki/**)", "Edit(reports/**)", "Edit(raw/notes/**)", "Edit(raw/calendar/**)",
       "Edit(TODAY.md)", "Edit(.brain/ingested.txt)",
       "Bash(obsidian orphans:*)", "Bash(obsidian unresolved:*)", "Bash(obsidian deadends:*)"
@@ -344,8 +344,8 @@ the source summary and nothing else. Note which AI it was when it matters.
 I'll use plain words. Match them to these.
 
 **ingest** ("ingest", "process inbox", "file this")
-1. New files = everything under raw/ (except assets/) not listed in .brain/ingested.txt. List them with
-   `find raw -type f`: Glob and Grep skip the gitignored session and chat digests.
+1. New files = everything under raw/ (except assets/) not listed in .brain/ingested.txt. If Glob doesn't list the
+   gitignored session and chat digests (it depends on Claude Code settings), use `ls -R raw`.
 2. For each: write wiki/sources/<name>.md (summary, key points, entities). Then create or update the
    people/projects/topics pages it touches, plus me.md and overview.md if they changed. Max 15 page edits per source.
 3. Update index.md, append to log.md. In interactive sessions also append the raw path to .brain/ingested.txt
