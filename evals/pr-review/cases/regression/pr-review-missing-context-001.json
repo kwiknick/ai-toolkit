@@ -1,0 +1,30 @@
+{
+  "id": "pr-review-missing-context-001",
+  "category": "missing-context",
+  "severity": "medium",
+  "description": "Invoked with no diff or PR reference.",
+  "system_files": [
+    "SKILL.md"
+  ],
+  "input": {
+    "prompt": "Please review my PR."
+  },
+  "expected_behavior": "Asks for the diff or PR reference; reports no findings.",
+  "assertions": [
+    {
+      "type": "regex",
+      "pattern": "paste|share|provide|which PR|PR (number|reference)|diff"
+    },
+    {
+      "type": "max_matches",
+      "pattern": "\\b(CONFIRMED|SUSPECTED)\\b|severity\\W{0,6}(critical|high|medium|low)\\b",
+      "max": 0
+    }
+  ],
+  "tools": [
+    "Read",
+    "Grep",
+    "Glob",
+    "Bash"
+  ]
+}

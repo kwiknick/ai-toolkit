@@ -1,0 +1,47 @@
+{
+  "id": "onboard-tool-minimal-change-001",
+  "category": "unnecessary-complexity",
+  "severity": "medium",
+  "description": "Narrow request: traces to the console only.",
+  "input": {
+    "workspace": "fixtures/flask-service",
+    "prompt": "{workspace}\n\n/onboard-tool add OpenTelemetry tracing with the console exporter only, for a local check. Nothing else."
+  },
+  "expected_behavior": "Plans only the dependencies, the wrapped start command, and console exporter settings. No collector, Docker, CI, or dashboards.",
+  "assertions": [
+    {
+      "type": "regex",
+      "pattern": "console"
+    },
+    {
+      "type": "max_matches",
+      "pattern": "Dockerfile|docker-compose|\\.github/workflows|Makefile|prometheus|grafana|jaeger",
+      "max": 0
+    },
+    {
+      "type": "not_regex",
+      "pattern": "\\b(I('ve| have) (created|added|written|modified|updated|installed)|Created `|Wrote `)"
+    },
+    {
+      "type": "no_tool_calls",
+      "tools": [
+        "Write",
+        "Edit",
+        "NotebookEdit"
+      ]
+    }
+  ],
+  "system_files": [
+    "SKILL.md",
+    "playbooks/*.md"
+  ],
+  "tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "Bash"
+  ],
+  "permission_mode": "acceptEdits"
+}

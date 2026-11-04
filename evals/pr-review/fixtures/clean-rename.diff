@@ -1,0 +1,15 @@
+PR title: Rename text helper for clarity
+PR description: Renames norm() to normalize_whitespace() and keeps the old name as an alias. No behavior change.
+
+diff --git a/utils/text.py b/utils/text.py
+--- a/utils/text.py
++++ b/utils/text.py
+@@ -1,2 +1,6 @@
+-def norm(s):
+-    return " ".join(s.split()).lower()
++def normalize_whitespace(text):
++    """Collapse runs of whitespace and lowercase."""
++    return " ".join(text.split()).lower()
++
++
++norm = normalize_whitespace  # backwards-compatible alias

@@ -1,0 +1,26 @@
+{
+  "id": "pr-review-fp-clean-refactor-001",
+  "category": "false-positive",
+  "severity": "medium",
+  "description": "Pure rename with a compatibility alias; nothing to flag.",
+  "system_files": [
+    "shared-review-discipline.md",
+    "factors/2-logic-correctness.md"
+  ],
+  "input": {
+    "fixture": "fixtures/clean-rename.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Reports no High/Critical findings and states what was checked (shared discipline rule 2).",
+  "assertions": [
+    {
+      "type": "severity_at_most",
+      "near": ".",
+      "level": "Medium"
+    },
+    {
+      "type": "regex",
+      "pattern": "checked|verified|ruled out"
+    }
+  ]
+}

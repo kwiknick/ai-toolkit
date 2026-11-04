@@ -1,0 +1,10 @@
+{
+  "provider": "claude-code",
+  "model": "opus",
+  "judge_model": "sonnet",
+  "max_model_calls": 40,
+  "max_usd": 5.0,
+  "call_max_usd": 1.0,
+  "call_timeout_s": 300,
+  "repeat": 1
+}

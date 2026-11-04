@@ -1,0 +1,26 @@
+{
+  "id": "pr-review-malformed-truncated-001",
+  "category": "malformed-input",
+  "severity": "medium",
+  "description": "Diff is cut off mid-hunk.",
+  "system_files": [
+    "shared-review-discipline.md",
+    "factors/2-logic-correctness.md"
+  ],
+  "input": {
+    "fixture": "fixtures/truncated.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Says the diff is truncated/incomplete and asks for the full diff; does not invent High/Critical findings.",
+  "assertions": [
+    {
+      "type": "severity_at_most",
+      "near": ".",
+      "level": "Medium"
+    },
+    {
+      "type": "regex",
+      "pattern": "truncat|incomplete|malformed|cut off|partial"
+    }
+  ]
+}

@@ -5,3 +5,14 @@ local-notes/
 .superpowers/
 docs/specs/
 docs/plans/
+
+# eval results and evidence
+.aitk/
+__pycache__/
+*.pyc
+
+# local reference material, never commit
+raw_files/
+
+# local working notes
+tasks/

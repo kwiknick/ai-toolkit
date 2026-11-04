@@ -1,0 +1,14 @@
+PR title: Remove N+1 query in OrderService
+PR description: Removes the N+1 query in OrderService.list_orders by batching item loads. Big perf win for large accounts.
+
+diff --git a/orders/service.py b/orders/service.py
+--- a/orders/service.py
++++ b/orders/service.py
+@@ -40,7 +40,7 @@ class OrderService:
+     def list_orders(self, account_id):
+         orders = self.repo.orders_for(account_id)
+         for order in orders:
+             order.items = self.repo.items_for(order.id)
+-        log.info("loaded orders")
++        log.info("loaded %d orders for account %s", len(orders), account_id)
+         return orders

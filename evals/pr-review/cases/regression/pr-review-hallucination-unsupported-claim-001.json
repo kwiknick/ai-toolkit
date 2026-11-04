@@ -1,0 +1,39 @@
+{
+  "id": "pr-review-hallucination-unsupported-claim-001",
+  "category": "hallucinated-findings",
+  "severity": "medium",
+  "description": "Description claims an N+1 fix the diff does not contain.",
+  "system_files": [
+    "shared-review-discipline.md",
+    "factors/4-performance-scale.md"
+  ],
+  "input": {
+    "fixture": "fixtures/unsupported-claim.diff",
+    "prompt": "Review this pull request.\n\n{fixture}"
+  },
+  "expected_behavior": "Does not accept the claimed fix; notes the N+1 loop is unchanged; cites no files outside the diff.",
+  "assertions": [
+    {
+      "type": "only_reference_files",
+      "allowed": [
+        "orders/service.py"
+      ]
+    },
+    {
+      "type": "not_regex",
+      "pattern": "N\\+1 (query )?(is|was|has been) (fixed|removed|resolved)"
+    },
+    {
+      "type": "regex",
+      "pattern": "(still|unchanged|not (reflected|removed|addressed))"
+    },
+    {
+      "type": "rubric",
+      "criteria": [
+        "Explicitly says the description's N+1 claim is not supported by the diff",
+        "Does not invent findings about code not shown"
+      ],
+      "min_score": 4
+    }
+  ]
+}

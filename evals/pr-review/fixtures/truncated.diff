@@ -1,0 +1,11 @@
+PR title: Retry failed webhook deliveries
+PR description: Adds retries.
+
+diff --git a/webhooks/deliver.py b/webhooks/deliver.py
+--- a/webhooks/deliver.py
++++ b/webhooks/deliver.py
+@@ -30,12 +30,25 @@ def deliver(event, endpoint):
+-    resp = http.post(endpoint.url, json=event.payload, timeout=5)
++    for attempt in range(MAX_ATTEMPTS):
++        try:
++            resp = http.post(endpoint.url, json=event.pay
